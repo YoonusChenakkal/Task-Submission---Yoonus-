@@ -66,7 +66,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadUser() async {
+  Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
     _email = prefs.getString('email');
