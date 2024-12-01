@@ -40,10 +40,10 @@ class AuthProvider with ChangeNotifier {
         ));
         notifyListeners();
       } else {
-        _showErrorMessage(context, 'Login failed: ${response.body}');
+        _showErrorMessage(context, 'Login failed');
       }
     } catch (e) {
-      _showErrorMessage(context, 'Login failed: $e');
+      _showErrorMessage(context, 'Login failed');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -51,9 +51,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   void _showErrorMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar( SnackBar(
       content: Text(message),
-      duration: const Duration(seconds: 2),
+      duration:  const Duration(seconds: 2),
     ));
   }
 
