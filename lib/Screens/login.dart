@@ -2,14 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:task1/Providers/authProvider.dart';
 import 'package:task1/Screens/home.dart';
 import 'package:task1/Widgets/customTextField.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   LoginPage({super.key});
 
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController tcEmail = TextEditingController();
   final TextEditingController tcPassword = TextEditingController();
+
+  @override
+  void dispose() {
+    tcEmail.dispose();
+    tcPassword.dispose();
+    super.dispose();
+  }
+
+  void _login(BuildContext context, AuthProvider authProvider) async {
+    await authProvider.login(
+      tcEmail.text,
+      tcPassword.text,
+      context,
+    );
+
+    if (authProvider.token != null) {
+      // On successful login, navigate to Home page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +63,14 @@ class LoginPage extends StatelessWidget {
                         Text(
                           'Flutter Mechine Test',
                           style: TextStyle(
-                              fontSize: 19.sp, fontWeight: FontWeight.w600),
+                              fontSize: 19.sp,
+                              fontWeight: FontWeight.w600
+                          ),
                         )
                       ],
-                    ))),
+                    )
+                )
+            ),
             Positioned(
               bottom: 0,
               child: Container(
@@ -59,7 +93,6 @@ class LoginPage extends StatelessWidget {
                         fontSize: 18.sp,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w600,
-                        height: 0,
                       ),
                     ),
                     SizedBox(height: 5.h),
@@ -72,7 +105,10 @@ class LoginPage extends StatelessWidget {
                       height: 3.h,
                     ),
                     customTextField(
-                        title: 'Password', width: 80.w, tc: tcPassword),
+                      title: 'Password',
+                      width: 80.w,
+                      tc: tcPassword,
+                    ),
                     SizedBox(
                       height: 4.h,
                     ),
@@ -83,49 +119,33 @@ class LoginPage extends StatelessWidget {
                         builder: (context, authProvider, child) {
                           return ElevatedButton(
                             onPressed: authProvider.isLoading
-                                ? null 
-                                : () async {
-                                    
-                                    await authProvider.login(
-                                      tcEmail.text,
-                                      tcPassword.text,
-                                      context,
-                                    );
-
-                                    if (authProvider.token != null) {
-                                      // On successful login, navigate to Home page
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomePage(),
-                                        ),
-                                      );
-                                    }
-                                  },
+                                ? null
+                                : () => _login(context, authProvider),
                             style: ButtonStyle(
-                              shape: WidgetStateProperty.all<
-                                  RoundedRectangleBorder>(
+                              shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
-                              backgroundColor: WidgetStateProperty.all(
-                                  const Color.fromARGB(255, 30, 121, 249)),
+                              backgroundColor: const WidgetStatePropertyAll(
+                                Color.fromARGB(255, 30, 121, 249),
+                              ),
                             ),
                             child: authProvider.isLoading
                                 ? SizedBox(
-                                    height: 3.h,
-                                    width: 7.w,
-                                    child: const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  ) // Show loader while loading
+                              height: 3.h,
+                              width: 7.w,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ) // Show loader while loading
                                 : Text(
-                                    'Login',
-                                    style: TextStyle(
-                                        fontSize: 15.sp, color: Colors.white),
-                                  ),
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: Colors.white
+                              ),
+                            ),
                           );
                         },
                       ),

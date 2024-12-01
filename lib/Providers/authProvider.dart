@@ -5,15 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
   String? _token;
-  String? _email;  
+  String? _email;
   bool _isLoading = false;
 
   String? get token => _token;
-  String? get email => _email; 
+  String? get email => _email;
   bool get isLoading => _isLoading;
 
-  Future<void> login(
-      String email, String password, BuildContext context) async {
+  Future<void> login(String email, String password, BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -30,8 +29,8 @@ class AuthProvider with ChangeNotifier {
 
         // Save token and email to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
-        prefs.setString('token', _token!);
-        prefs.setString('email', email); 
+        await prefs.setString('token', _token!);
+        await prefs.setString('email', email);
 
         _email = email;
 
@@ -39,39 +38,38 @@ class AuthProvider with ChangeNotifier {
           content: Text('Logged In Successfully'),
           duration: Duration(seconds: 2),
         ));
-
         notifyListeners();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Login failed'),
-          duration: Duration(seconds: 2),
-        ));
+        _showErrorMessage(context, 'Login failed: ${response.body}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Login failed: $e'),
-        duration: const Duration(seconds: 2),
-      ));
+      _showErrorMessage(context, 'Login failed: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  //  To logout user
+  void _showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-    await prefs.remove('email');  
-        _token = null;
-    _email = null;  
+    await prefs.remove('email');
+    _token = null;
+    _email = null;
     notifyListeners();
   }
 
   Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
-    _email = prefs.getString('email');  
+    _email = prefs.getString('email');
     notifyListeners();
   }
 }
